@@ -1,20 +1,140 @@
 # Reproducible Research: Peer Assessment 1
 
+```{r setoptions,echo=FALSE}
+opts_chunk$set(echo=TRUE)
+```
 
 ## Loading and preprocessing the data
 
+```{r}
+# create the data folder
 
+if (!file.exists("data")) {
+        dir.create("data")
+        }
+
+# unzip the file use utils package use "install.packages('utils')" to install
+
+library(utils)
+unzip('./activity.zip', exdir = './data/')
+
+# read the data
+
+DF <- read.csv('./data/activity.csv')
+
+# change the class of 'date' variable from factor to date
+
+DF$date <- as.Date(DF$date,'%Y-%m-%d')
+```
+
+I loaded the data into a data frame called DF with the variable 'date' changed to
+a date class.
 
 ## What is mean total number of steps taken per day?
 
+```{r}
+# ignore the NA
 
+DFn <- DF[!is.na(DF$steps),]
+
+# make a histogram of the total number of steps taken each day
+
+library(lattice)
+with(DFn,histogram(~steps|date))
+```
+
+Mean total number of steps taken per day could be get from the following code.
+
+```{r}
+# calculate and report the mean and median total number of steps taken per day
+
+with(DFn,tapply(steps,date,mean))
+
+with(DFn,tapply(steps,date,median))
+
+```
 
 ## What is the average daily activity pattern?
 
+Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
+and the average number of steps taken, averaged across all days (y-axis)
 
+```{r}
+plot(unique(DFn$interval),with(DFn,tapply(steps,interval,mean)),
+     xlab='Interval',
+     ylab='Numbers of steps',
+     type='l')
+```
+
+Which 5-minute interval, on average across all the days in the dataset,
+contains the maximum number of steps?
+
+```{r}
+names(which.max(with(DFn,tapply(steps,interval,mean))))
+```
+
+It seems that around 8:35AM is the most active time segment for the anonymous 
+individual.
 
 ## Imputing missing values
 
+Note that there are a number of days/intervals where there are missing values
+(coded as NA). The presence of missing days may introduce bias into some
+calculations or summaries of the data.
 
+The total number of missing values in the dataset is get by the following code.
+In fact, only the steps have NA.
+
+```{r}
+sum(!complete.cases(DF))
+```
+
+Use the mean for that 5-minute interval to fill in the missing NA for there are 
+patterns during a day and create a new dataset called DFnew with the missing 
+data filled in.
+
+```{r}
+group <- split(DF,DF$interval)
+DFnew <- data.frame(DF[0,])
+findNA <- function (x){
+        x[which(!complete.cases(x)),1] <- mean(x[-which(!complete.cases(x)),1])
+        x
+}
+for (i in 1:288){
+        DFnew <- rbind(DFnew,findNA(group[[i]]))
+}
+```
+
+Plot histogram of the total number of steps taken each day and calculate the 
+mean and median total number of steps taken per day. 
+
+```{r}
+library(lattice)
+with(DFnew,histogram(~steps|date))
+with(DFnew,tapply(steps,date,mean))
+with(DFnew,tapply(steps,date,median))
+```
+
+These values are differ from the estimates from the first part of the assignment
+depending on the impute method.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+# add 'weekday' variable
+
+DFnew$weekday <- 'weekend'
+DFnew[!(weekdays(DFnew$date)=="Sunday"|weekdays(DFnew$date)=="Saturday"),]$weekday <- 'weekday'
+
+# plot the differences and the log 10 based version in the comment line
+
+library(lattice)
+with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),ylab='Numbers of steps'))
+# with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),ylab='Numbers of steps'))
+```
+
+The differeces is clear from the plot, the steps is earlier on weekday and the
+anonymous individual may like to walk on weekend evening. I noticed the figure 
+in the instruction use a log based transform which I don't think is useful for 
+this problem to find the patterns.
+
