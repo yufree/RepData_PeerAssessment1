@@ -261,13 +261,13 @@ DFnew[!(weekdays(DFnew$date) == "Sunday" | weekdays(DFnew$date) == "Saturday"),
 
 library(lattice)
 with(DFnew, xyplot(steps ~ interval | weekday, type = "l", layout = c(1, 2), 
-    ylab = "Numbers of steps"))
+    xlab = "Inerval", ylab = "Numbers of steps"))
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
 
 ```r
-# with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),ylab='Numbers
+# with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),xlab='Inerval',ylab='Numbers
 # of steps'))
 ```
 

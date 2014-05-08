@@ -129,8 +129,8 @@ DFnew[!(weekdays(DFnew$date)=="Sunday"|weekdays(DFnew$date)=="Saturday"),]$weekd
 # plot the differences and the log 10 based version in the comment line
 
 library(lattice)
-with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),ylab='Numbers of steps'))
-# with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),ylab='Numbers of steps'))
+with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),xlab='Inerval',ylab='Numbers of steps'))
+# with(DFnew,xyplot(steps~interval|weekday,type='l',layout=c(1,2),xlab='Inerval',ylab='Numbers of steps'))
 ```
 
 The differeces is clear from the plot, the steps is earlier on weekday and the
